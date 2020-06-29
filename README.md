@@ -8,4 +8,4 @@
 1.      pip install -r requirement.txt
 2.      python main.py [video path] [result_path] [step] [image type : PNG / JPG]
     If you had permission error.
-*       python -m pip install --user "opencv-contrib-python"
+*       python -m pip install "<module>" --user

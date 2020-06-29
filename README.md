@@ -6,6 +6,6 @@
 
 ## How to Use
 1.      pip install -r requirement.txt
-2.      python main.py [video path] [result_path] [step] [image type : PNG / JPG]
+2.      python main.py [video path] [result path] [step] [image type : PNG / JPG]
     If you had permission error.
 *       python -m pip install "<module>" --user

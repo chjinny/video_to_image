@@ -13,6 +13,10 @@ class ThreadClass_converter(QThread):
         self.obj = obj
     def run(self): 
         self.obj.process(self.arg[0], self.arg[1], self.arg[2], self.arg[3])
+    
+    def __del__(self): 
+        self.wait()
+
 
 class MyApp(QWidget):
 
@@ -20,6 +24,7 @@ class MyApp(QWidget):
         super().__init__()
         self.threadclass_converter = ThreadClass_converter() 
         self.converter = cvt.Converter()
+        self.convert_on = False
         self.initUI()
 
     def initUI(self):
@@ -72,6 +77,7 @@ class MyApp(QWidget):
         # 34 Convert
         self.pushButtons.append(QPushButton("Convert"))
         self.pushButtons[-1].clicked.connect(self.convert)
+        self.pushButtons[-1].clicked.connect(self.toggle)
         self.layout.addWidget(self.pushButtons[-1])
 
 
@@ -107,6 +113,15 @@ class MyApp(QWidget):
         fname = QFileDialog.getExistingDirectory(self)
         self.labels[1].setText(fname)
         self.output_dir = fname
+
+    def toggle(self):
+        if self.convert_on == False:
+            self.pushButtons[4].setText("Stop")
+            self.convert_on = True
+        else: #state == "Stop":
+            self.pushButtons[4].setText("Convert")
+            self.threadclass_converter.terminate()
+            self.convert_on = False
 
     def convert(self):
         self.type_name = ""

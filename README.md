@@ -14,3 +14,6 @@
 - PYQT
     - https://wikidocs.net/21920
     - https://wikidocs.net/38037
+    - https://daaam11.tistory.com/19
+- OS
+    - https://hwangyoungjae.tistory.com/50

@@ -21,33 +21,28 @@ class Converter:
 
     def analyze(self):
         cap = cv2.VideoCapture(self.input_path)
-        self.total = int(cap.get(cv2.CAP_PROP_FRAME_COUNT)) * 2
+        self.total = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 
         if cap.isOpened() == False:
             print("error")
             
         i = 0
+        j = 0
+        digit =len(str(self.total)) 
         while(cap.isOpened()):
             ret, frame = cap.read()
             if i%self.step == 0 :
                 if ret:
                     #print("{} {}".format(i, i%step))
-                    self.stream.append(frame)
+                    #self.stream.append(frame)
+                    name = '0' * (digit - len(str(j))) + str(j)
+                    cv2.imwrite("{}/{}.{}".format(self.output_dir, name, self.type_name), frame)
+                    j += 1
                 else :
                     break
             i+=1
         cap.release()
         self.is_analyzed = True
-
-    def convert(self):
-        length = len(self.stream)
-        digit = len(str(length))
-        for i in range(length):
-            name = '0' * (digit - len(str(i))) + str(i)
-            cv2.imwrite("{}/{}.{}".format(self.output_dir, name, self.type_name), self.stream[i])
-            self.fin = i
-            sys.stdout.write("Download progress: %d%%   \r" % ((self.fin*2)/self.total) )
-            sys.stdout.flush()
 
     def process(self, input_path, output_dir, step, type_name):
         print(input_path, output_dir, step, type_name)
@@ -55,8 +50,6 @@ class Converter:
         self.setup(input_path, output_dir, step, type_name)
         print("start analyze")
         self.analyze()
-        print("start convert")
-        self.convert()
 
 def main():
     parser = arg.ArgumentParser()

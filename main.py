@@ -1,12 +1,14 @@
 import sys
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QIcon
-import convert
+from PyQt5.QtCore import QBasicTimer
+import converter as cvt
 
 class MyApp(QWidget):
 
     def __init__(self):
         super().__init__()
+        self.converter = cvt.Converter()
         self.initUI()
 
     def initUI(self):
@@ -29,21 +31,48 @@ class MyApp(QWidget):
             self.layout.addWidget(self.pushButtons[i])
             self.layout.addWidget(self.labels[i])
 
+        self.pushButtons.append(QPushButton("Analyze"))
+        self.pushButtons[-1].clicked.connect(self.analyze)
+        self.layout.addWidget(self.pushButtons[-1])
+        
         label = QLabel()
         label.setText("Image Type")
         self.layout.addWidget(label)
         
         self.rbtn1 = QRadioButton('JPG', self)
         self.rbtn1.setChecked(True)
-        self.layout.addWidget(rbtn1)
+        self.layout.addWidget(self.rbtn1)
 
         self.rbtn2 = QRadioButton('PNG', self)
-        self.layout.addWidget(rbtn2)
+        self.layout.addWidget(self.rbtn2)
 
         self.pushButtons.append(QPushButton("Convert"))
         self.pushButtons[-1].clicked.connect(self.convert)
+        self.pushButtons[-1].clicked.connect(self.doAction)
         self.layout.addWidget(self.pushButtons[-1])
+
+        self.pbar = QProgressBar(self)
+        self.step = 0
+        self.timer = QBasicTimer()
+        self.layout.addWidget(self.pbar)
+
         self.setLayout(self.layout)
+
+    def doAction(self):
+        if self.timer.isActive():
+            self.timer.stop()
+            self.pushButtons[-1].setText('Convert')
+        else:
+            self.timer.start(100, self)
+            self.pushButtons[-1].setText('Stop')
+
+    def timerEvent(self, e):
+        if self.step >= 100:
+            self.timer.stop()
+            self.btn.setText('Finished')
+            return
+        self.step = self.converter.fin * 100 // self.converter.total
+        self.pbar.setValue(self.step)
 
     def file_input(self):
         fname = QFileDialog.getOpenFileName(self)
@@ -67,8 +96,8 @@ class MyApp(QWidget):
             convert_type = "png"
         else: # self.rbtn1.isChecked():
             convert_type = "jpg"
-
-        convert.convert(input_file, output_dir, step, type_name)
+        
+        self.converter.process(input_file, output_dir, step, type_name)
 
 if __name__ == '__main__':
    app = QApplication(sys.argv)

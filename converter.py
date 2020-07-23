@@ -1,25 +1,27 @@
 import cv2
 import numpy as np
 import argparse as arg
+import os
 
 class Converter:
     def __init__(self):
         super().__init__()
         self.total = 100
+        self.step = 1
         self.fin = 0
         self.is_seted = False
         self.is_analyzed = False
+        self.stream = []
 
     def setup(self, input_path, output_dir, step, type_name):
-        self.input_path = input_path
-        self.output_dir = output_dir
+        self.input_path = os.path.normcase(input_path)
+        self.output_dir = os.path.normcase(output_dir)
         self.step = step
         self.type_name = type_name
-        self.stream = []
-        self.is_seted = True
 
     def analyze(self):
         cap = cv2.VideoCapture(self.input_path)
+        self.total = int(cap.get(cv2.CAP_PROP_FRAME_COUNT)) * 2
 
         if cap.isOpened() == False:
             print("error")
@@ -35,7 +37,6 @@ class Converter:
                     break
             i+=1
         cap.release()
-        self.total = len(self.stream)
         self.is_analyzed = True
 
     def convert(self):
@@ -45,6 +46,17 @@ class Converter:
             name = '0' * (digit - len(str(i))) + str(i)
             cv2.imwrite("{}/{}.{}".format(self.output_dir, name, self.type_name), self.stream[i])
             self.fin = i
+            sys.stdout.write("Download progress: %d%%   \r" % ((self.fin*2)/self.total) )
+            sys.stdout.flush()
+
+    def process(self, input_path, output_dir, step, type_name):
+        print(input_path, output_dir, step, type_name)
+        print("start setup")
+        self.setup(input_path, output_dir, step, type_name)
+        print("start analyze")
+        self.analyze()
+        print("start convert")
+        self.convert()
 
 def main():
     parser = arg.ArgumentParser()
@@ -55,9 +67,8 @@ def main():
 
     args = parser.parse_args()
     converter = Converter()
-    converter.setup(args.input, args.output_dir, args.step, args.type)
-    converter.analyze()
-    converter.convert()
+    converter.process(args.input, args.output_dir, args.step, args.type)
+
 
     
 if __name__=="__main__":

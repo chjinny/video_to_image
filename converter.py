@@ -44,6 +44,7 @@ class Converter:
                     break
             i+=1
         cap.release()
+        print("process : {}%  ({}/{})".format(int(self.fin/self.total*100), self.fin, self.total))
         print("Done!")
         self.is_analyzed = True
 

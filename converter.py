@@ -21,7 +21,7 @@ class Converter:
 
     def analyze(self):
         cap = cv2.VideoCapture(self.input_path)
-        self.total = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+        self.total = int(cap.get(cv2.CAP_PROP_FRAME_COUNT)) // self.step
 
         if cap.isOpened() == False:
             print("error")
@@ -38,10 +38,13 @@ class Converter:
                     name = '0' * (digit - len(str(j))) + str(j)
                     cv2.imwrite("{}/{}.{}".format(self.output_dir, name, self.type_name), frame)
                     j += 1
+                    self.fin = j
+                    print("process : {}%  ({}/{})".format(int(self.fin/self.total*100), self.fin, self.total), end="\r", flush=True)
                 else :
                     break
             i+=1
         cap.release()
+        print("Done!")
         self.is_analyzed = True
 
     def process(self, input_path, output_dir, step, type_name):
